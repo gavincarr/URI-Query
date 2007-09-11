@@ -1,0 +1,34 @@
+URI/Query
+=========
+
+URI::Query provides simple URI query string manipulation, allowing you
+to create and manipulate URI query strings from GET and POST requests in
+web applications. This is primarily useful for creating links where you 
+wish to preserve some subset of the parameters to the current request,
+and potentially add or replace others. Given a query string this is 
+doable with regexes, of course, but making sure you get the anchoring 
+and escaping right is tedious and error-prone - using this module is 
+much simpler.
+
+INSTALLATION
+
+Installation is the standard perl install tango:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  URI::Escape
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Gavin Carr. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
