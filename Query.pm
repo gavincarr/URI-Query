@@ -13,7 +13,7 @@ use overload
   'ne'  => sub { $_[0]->stringify ne $_[1]->stringify };
 use vars q($VERSION);
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 # -------------------------------------------------------------------------
 # Remove all occurrences of the given parameters
@@ -93,7 +93,7 @@ sub hash
     my $self = shift;
     my %qq = %{$self->{qq}};
     # Flatten one element arrays
-    for (keys %qq) {
+    for (sort keys %qq) {
       $qq{$_} = $qq{$_}->[0] if @{$qq{$_}} == 1;
     }
     return wantarray ? %qq : \%qq;
@@ -113,7 +113,7 @@ sub hidden
 {
     my $self = shift;
     my $str = '';
-    for my $key (keys %{$self->{qq}}) {
+    for my $key (sort keys %{$self->{qq}}) {
         for my $value (@{$self->{qq}->{$key}}) {
             $str .= qq(<input type="hidden" name="$key" value="$value" />\n);
         } 
