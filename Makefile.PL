@@ -6,10 +6,9 @@ WriteMakefile(
     'NAME'		=> 'URI::Query',
     'VERSION_FROM'	=> 'Query.pm', # finds $VERSION
     'PREREQ_PM'		=> {
-       URI::Escape => 0,
-       Test::More => 0,
+       URI          => 1.31,
+       Test::More   => 0,
     }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (AUTHOR     => 'Gavin Carr <gavin@openfusion.com.au>') : ()),
 );
-# arch-tag: e3628f30-b383-4c8b-ad6c-e71ca0b91e7f

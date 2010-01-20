@@ -5,15 +5,17 @@
 package URI::Query;
 
 use 5.00503;
-use URI::Escape;
 use strict;
+
+use URI::Escape qw(uri_escape_utf8);
+
 use overload 
   '""'    => \&stringify,
   'eq'  => sub { $_[0]->stringify eq $_[1]->stringify },
   'ne'  => sub { $_[0]->stringify ne $_[1]->stringify };
-use vars q($VERSION);
 
-$VERSION = '0.06';
+use vars q($VERSION);
+$VERSION = '0.07';
 
 # -------------------------------------------------------------------------
 # Remove all occurrences of the given parameters
@@ -70,7 +72,7 @@ sub stringify
     my @out = ();
     for my $key (sort keys %{$self->{qq}}) {
         for my $value (sort @{$self->{qq}->{$key}}) {
-            push @out, sprintf("%s=%s", uri_escape($key), uri_escape($value));
+            push @out, sprintf("%s=%s", uri_escape_utf8($key), uri_escape_utf8($value));
         }
     }
     join $sep, @out;
@@ -272,13 +274,11 @@ Gavin Carr <gavin@openfusion.com.au>
 
 =head1 COPYRIGHT
 
-Copyright 2004-2005, Gavin Carr. All Rights Reserved.
+Copyright 2004-2010, Gavin Carr. All Rights Reserved.
 
 This program is free software. You may copy or redistribute it under the 
 same terms as perl itself.
 
-
 =cut
 
-# arch-tag: 66eb6ee6-02bb-43e5-bda7-9529ad44f86f
 
