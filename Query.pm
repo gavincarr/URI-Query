@@ -7,7 +7,7 @@ package URI::Query;
 use 5.00503;
 use strict;
 
-use URI::Escape qw(uri_escape_utf8);
+use URI::Escape qw(uri_escape_utf8 uri_unescape);
 
 use overload 
   '""'    => \&stringify,
@@ -130,7 +130,7 @@ sub parse_qs
     my $self = shift;
     my $qs = shift;
     for (split /&/, $qs) {
-        my ($key, $value) = split /=/;
+        my ($key, $value) = map { uri_unescape($_) } split /=/, $_, 2;
         $self->{qq}->{$key} ||= [];
         push @{$self->{qq}->{$key}}, $value if defined $value && $value ne '';
     }
