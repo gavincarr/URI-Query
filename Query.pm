@@ -438,7 +438,7 @@ to understand the structure of the query to escape elements correctly.
 
 =head1 PATCHES
 
-URI::Query code now lives at L<https://github.com/gavincarr/URI-Query.
+URI::Query code lives at L<https://github.com/gavincarr/URI-Query>.
 Patches / pull requests welcome!
 
 
