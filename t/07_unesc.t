@@ -10,14 +10,28 @@ use strict;
 use Test::More;
 BEGIN { use_ok( 'URI::Query' ) }
 
-my $qq;
-
-ok($qq = URI::Query->new('group=prod%2Cinfra%2Ctest&op%3Aset=x%3Dy'), 'qq constructor ok');
-is_deeply(scalar $qq->hash, {
+my $data_esc = {
+  group     => 'prod%2Cinfra%2Ctest',
+  'op%3Aset'  => 'x%3Dy',
+};
+my $data_unesc = {
   group     => 'prod,infra,test',
   'op:set'  => 'x=y',
-}, '$qq->hash keys and values are unescaped');
-is("$qq", 'group=prod%2Cinfra%2Ctest&op%3Aset=x%3Dy', 'stringified keys/values escaped ok');
+};
+my $qs_esc = 'group=prod%2Cinfra%2Ctest&op%3Aset=x%3Dy';
+my ($qq, $qs);
+
+ok($qq = URI::Query->new($qs_esc), 'qq string constructor ok');
+is_deeply(scalar $qq->hash, $data_unesc, '$qq->hash keys and values are unescaped');
+is("$qq", $qs_esc, 'stringified keys/values escaped ok');
+
+ok($qq = URI::Query->new($data_esc), 'qq hashref constructor ok');
+is_deeply(scalar $qq->hash, $data_unesc, '$qq->hash keys and values are unescaped');
+is("$qq", $qs_esc, 'stringified keys/values escaped ok');
+
+ok($qq = URI::Query->new(%$data_esc), 'qq hash constructor ok');
+is_deeply(scalar $qq->hash, $data_unesc, '$qq->hash keys and values are unescaped');
+is("$qq", $qs_esc, 'stringified keys/values escaped ok');
 
 done_testing;
 

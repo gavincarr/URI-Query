@@ -15,7 +15,7 @@ use overload
   'ne'  => sub { $_[0]->stringify ne $_[1]->stringify };
 
 use vars q($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 # -------------------------------------------------------------------------
 # Remove all occurrences of the given parameters
@@ -82,7 +82,7 @@ sub revert
 {
     my $self = shift;
     # Revert qq to the qq_orig hashref
-    $self->{qq} = $self->deepcopy($self->{qq_orig});
+    $self->{qq} = $self->_deepcopy($self->{qq_orig});
     $self
 }
 
@@ -124,29 +124,23 @@ sub hidden
 }
 
 # -------------------------------------------------------------------------
-# Parse query string, storing as hash (qq) of key => arrayref pairs
-sub parse_qs
+# Set the output separator to use by default
+sub separator
 {
     my $self = shift;
-    my $qs = shift;
-    for (split /&/, $qs) {
-        my ($key, $value) = map { uri_unescape($_) } split /=/, $_, 2;
-        $self->{qq}->{$key} ||= [];
-        push @{$self->{qq}->{$key}}, $value if defined $value && $value ne '';
-    }
-    $self
+    $self->{sep} = shift;
 }
 
 # Deep copy routine, originally swiped from a Randal Schwartz column
-sub deepcopy 
+sub _deepcopy 
 {
     my ($self, $this) = @_;
     if (! ref $this) {
         return $this;
     } elsif (ref $this eq "ARRAY") {
-        return [map $self->deepcopy($_), @$this];
+        return [map $self->_deepcopy($_), @$this];
     } elsif (ref $this eq "HASH") {
-        return {map { $_ => $self->deepcopy($this->{$_}) } keys %$this};
+        return {map { $_ => $self->_deepcopy($this->{$_}) } keys %$this};
     } elsif (ref $this eq "CODE") {
         return $this;
     } elsif (sprintf $this) {
@@ -157,11 +151,41 @@ sub deepcopy
     }
 }
 
-# Set the output separator to use by default
-sub separator
+# Parse query string, storing as hash (qq) of key => arrayref pairs
+sub _parse_qs
 {
     my $self = shift;
-    $self->{sep} = shift;
+    my $qs = shift;
+    for (split /[&;]/, $qs) {
+        my ($key, $value) = map { uri_unescape($_) } split /=/, $_, 2;
+        $self->{qq}->{$key} ||= [];
+        push @{$self->{qq}->{$key}}, $value if defined $value && $value ne '';
+    }
+    $self
+}
+
+# Process arrayref arguments into hash (qq) of key => arrayref pairs
+sub _init_from_arrayref
+{
+    my ($self, $arrayref) = @_;
+    while (@$arrayref) {
+        my $key   = shift @$arrayref;
+        my $value = shift @$arrayref;
+        my $key_unesc = uri_unescape($key);
+
+        $self->{qq}->{$key_unesc} ||= [];
+        if (defined $value && $value ne '') {
+            if (! ref $value) {
+                push @{$self->{qq}->{$key_unesc}}, uri_unescape($value);
+            }
+            elsif (ref $value eq 'ARRAY') {
+                push @{$self->{qq}->{$key_unesc}}, map { uri_unescape($_) } @$value;
+            }
+            else {
+                die "Invalid value found: $value. Not string or arrayref!";
+            }
+        }
+    }
 }
 
 # Constructor - either new($qs) where $qs is a scalar query string or a 
@@ -172,30 +196,18 @@ sub new
     my $class = shift;
     my $self = bless { qq => {} }, $class;
     if (@_ == 1 && ! ref $_[0] && $_[0]) {
-        my $qs = shift || '';
-        # Standardise arg separator
-        $qs =~ s/;/&/g;
-        $self->parse_qs($qs);
+        $self->_parse_qs($_[0]);
     }
     elsif (@_ == 1 && ref $_[0] eq 'HASH') {
-        for my $key (keys %{$_[0]}) {
-            $self->{qq}->{$key} ||= [];
-            my $value = $_[0]->{$key};
-            push @{$self->{qq}->{$key}}, (ref $value eq 'ARRAY' ? @$value : $value)
-                if defined $value && $value ne '';
-        }
+        $self->_init_from_arrayref([ %{$_[0]} ]);
     }
-    else {
-        while (@_ >= 2) {
-            my $key = shift;
-            my $value = shift;
-            $self->{qq}->{$key} ||= [];
-            push @{$self->{qq}->{$key}}, (ref $value eq 'ARRAY' ? @$value : $value)
-                if defined $value && $value ne '';
-        }
+    elsif (scalar(@_) % 2 == 0) {
+        $self->_init_from_arrayref(\@_);
     }
+
     # Clone the qq hashref to allow reversion 
-    $self->{qq_orig} = $self->deepcopy($self->{qq});
+    $self->{qq_orig} = $self->_deepcopy($self->{qq});
+
     return $self;
 }
 # -------------------------------------------------------------------------
@@ -263,9 +275,6 @@ and escaping right is tedious and error-prone - this module is simpler.
 
 None known.
 
-Note that this module doesn't do any input unescaping of query strings - 
-you're (currently) expected to handle that explicitly yourself.
-
 
 =head1 AUTHOR
 
@@ -274,11 +283,11 @@ Gavin Carr <gavin@openfusion.com.au>
 
 =head1 COPYRIGHT
 
-Copyright 2004-2010, Gavin Carr. All Rights Reserved.
+Copyright 2004-2011, Gavin Carr. All Rights Reserved.
 
 This program is free software. You may copy or redistribute it under the 
 same terms as perl itself.
 
 =cut
 
-
+# vim:sw=4:et
