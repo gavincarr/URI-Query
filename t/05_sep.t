@@ -62,5 +62,3 @@ $out = $qq->stringify;
 report $out, "default";
 is($out, $result{default}, "setting default separator ok");
 
-
-# arch-tag: c8d36b26-e951-4445-a280-bfdcb652b4e0

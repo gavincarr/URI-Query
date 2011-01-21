@@ -30,4 +30,3 @@ for my $bad ((undef, '', \"foo", [ foo => 1 ], \*bad)) {
   is($qq->stringify, '', sprintf("stringifies ok (%s)", $qq->stringify));
 }
 
-# arch-tag: 714ab082-385f-4158-bbf5-7547759ec65e

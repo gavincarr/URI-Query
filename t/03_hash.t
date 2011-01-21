@@ -63,5 +63,3 @@ $out = $qq->hidden;
 report $out, "hidden";
 is($out, $result{hidden}, 'hidden ok');
 
-
-# arch-tag: 5f2184d9-67f0-4f89-a1e8-1f67beabdaa2

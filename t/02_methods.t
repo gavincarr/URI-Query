@@ -41,4 +41,3 @@ ok($qq->strip_null, "strip_null ok");
 is($qq->stringify, 'bog=abc&foo=1&foo=2&zero=0', 
   sprintf("strip_null correct (%s)", $qq->stringify));
 
-# arch-tag: 41878e14-bac6-41ab-9fa8-329151afb4de

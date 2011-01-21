@@ -23,5 +23,3 @@ $qq->revert;
 my $str3 = $qq->stringify;
 is($str1, $str3, "strings identical after revert");
 
-
-# arch-tag: 8db23dc8-a686-467f-a2f0-ca9127bb1f18

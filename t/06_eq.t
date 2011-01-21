@@ -13,5 +13,3 @@ is($qq1, $qq2, 'eq ok');
 ok($qq2 = URI::Query->new('bar=3'), 'qq2 constructor ok');
 isnt($qq1, $qq2, 'ne ok');
 
-
-# arch-tag: 0fa9697e-843a-4cd3-a4d5-c4aac67430a0
