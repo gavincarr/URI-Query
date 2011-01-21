@@ -1,5 +1,6 @@
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 Query.pm
 README
 t/01_constructor.t
@@ -8,6 +9,7 @@ t/03_hash.t
 t/04_revert.t
 t/05_sep.t
 t/06_eq.t
+t/07_unesc.t
 t/t03/hash
 t/t03/hash_arrayref
 t/t03/hidden
