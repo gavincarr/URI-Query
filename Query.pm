@@ -9,7 +9,7 @@ use strict;
 
 use URI::Escape qw(uri_escape_utf8 uri_unescape);
 
-use overload 
+use overload
   '""'    => \&stringify,
   'eq'  => sub { $_[0]->stringify eq $_[1]->stringify },
   'ne'  => sub { $_[0]->stringify ne $_[1]->stringify };
@@ -111,14 +111,14 @@ sub hash_arrayref
 }
 
 # Return the current query as a string of html hidden input tags
-sub hidden 
+sub hidden
 {
     my $self = shift;
     my $str = '';
     for my $key (sort keys %{$self->{qq}}) {
         for my $value (@{$self->{qq}->{$key}}) {
             $str .= qq(<input type="hidden" name="$key" value="$value" />\n);
-        } 
+        }
     }
     return $str;
 }
@@ -132,7 +132,7 @@ sub separator
 }
 
 # Deep copy routine, originally swiped from a Randal Schwartz column
-sub _deepcopy 
+sub _deepcopy
 {
     my ($self, $this) = @_;
     if (! ref $this) {
@@ -188,7 +188,7 @@ sub _init_from_arrayref
     }
 }
 
-# Constructor - either new($qs) where $qs is a scalar query string or a 
+# Constructor - either new($qs) where $qs is a scalar query string or a
 #   a hashref of key => value pairs, or new(key => val, key => val);
 #   In the array form, keys can repeat, and/or values can be arrayrefs.
 sub new
@@ -205,7 +205,7 @@ sub new
         $self->_init_from_arrayref(\@_);
     }
 
-    # Clone the qq hashref to allow reversion 
+    # Clone the qq hashref to allow reversion
     $self->{qq_orig} = $self->_deepcopy($self->{qq});
 
     return $self;
@@ -222,8 +222,10 @@ URI::Query - class providing URI query string manipulation
 
     # Constructor - using a GET query string
     $qq = URI::Query->new($query_string);
-    # OR Constructor - using a set of key => value parameters 
-    $qq = URI::Query->new(%Vars);
+    # OR Constructor - using a hashref of key => value parameters
+    $qq = URI::Query->new($cgi->Vars);
+    # OR Constructor - using an array of successive keys and values
+    $qq = URI::Query->new(@params);
 
     # Remove all occurrences of the given parameters
     $qq->strip('page', 'next');
@@ -264,11 +266,37 @@ URI::Query - class providing URI query string manipulation
 
 URI::Query provides simple URI query string manipulation, allowing you
 to create and manipulate URI query strings from GET and POST requests in
-web applications. This is primarily useful for creating links where you 
+web applications. This is primarily useful for creating links where you
 wish to preserve some subset of the parameters to the current request,
-and potentially add or replace others. Given a query string this is 
-doable with regexes, of course, but making sure you get the anchoring 
+and potentially add or replace others. Given a query string this is
+doable with regexes, of course, but making sure you get the anchoring
 and escaping right is tedious and error-prone - this module is simpler.
+
+=head2 CONSTRUCTOR
+
+URI::Query objects can be constructed from scalar query strings
+('foo=1&bar=2&bar=3'), from a hashref with names as keys, and values
+either scalars or arrayrefs of scalars (to handle the case of keys with
+multiple values e.g. { foo => '1', bar => [ '2', '3' ] }), or arrays
+composed of successive key-value pairs ('foo', '1', 'bar', '2', 'bar',
+'3') e.g.
+
+    # Constructor - using a GET query string
+    $qq = URI::Query->new($query_string);
+
+    # Constructor - using an array of successive keys and values
+    $qq = URI::Query->new(@params);
+
+    # Constructor - using a hashref of key => value parameters,
+    # where values are either scalars or arrayrefs of scalars
+    $qq = URI::Query->new($cgi->Vars);
+
+URI::Query also handles L<CGI.pm>-style hashrefs, where multiple
+values are packed into a single string, separated by the "\0" (null)
+character.
+
+
+=head2 METHODS
 
 
 =head1 BUGS AND CAVEATS
@@ -285,7 +313,7 @@ Gavin Carr <gavin@openfusion.com.au>
 
 Copyright 2004-2011, Gavin Carr. All Rights Reserved.
 
-This program is free software. You may copy or redistribute it under the 
+This program is free software. You may copy or redistribute it under the
 same terms as perl itself.
 
 =cut
