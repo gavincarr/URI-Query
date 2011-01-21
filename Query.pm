@@ -175,15 +175,17 @@ sub _init_from_arrayref
 
         $self->{qq}->{$key_unesc} ||= [];
         if (defined $value && $value ne '') {
+            my @values;
             if (! ref $value) {
-                push @{$self->{qq}->{$key_unesc}}, uri_unescape($value);
+                @values = split "\0", $value;
             }
             elsif (ref $value eq 'ARRAY') {
-                push @{$self->{qq}->{$key_unesc}}, map { uri_unescape($_) } @$value;
+                @values = @$value;
             }
             else {
                 die "Invalid value found: $value. Not string or arrayref!";
             }
+            push @{$self->{qq}->{$key_unesc}}, map { uri_unescape($_) } @values;
         }
     }
 }
