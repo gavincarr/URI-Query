@@ -71,7 +71,7 @@ sub stringify
     my $sep = shift || $self->{sep} || '&';
     my @out = ();
     for my $key (sort keys %{$self->{qq}}) {
-        for my $value (sort @{$self->{qq}->{$key}}) {
+        for my $value (@{$self->{qq}->{$key}}) {
             push @out, sprintf("%s=%s", uri_escape_utf8($key), uri_escape_utf8($value));
         }
     }

@@ -1,6 +1,11 @@
+.*.sw?
+*~
+blib*
 ChangeLog
 Makefile
 Makefile.old
 MANIFEST.bak
-blib
-pm_to_blib
+pm_to_blib*
+MANIFEST.bak
+MYMETA.*
+TODO
