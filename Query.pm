@@ -15,7 +15,7 @@ use overload
   'ne'  => sub { $_[0]->stringify ne $_[1]->stringify };
 
 use vars q($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 # -------------------------------------------------------------------------
 # Remove all occurrences of the given parameters
