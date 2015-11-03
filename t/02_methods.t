@@ -1,6 +1,6 @@
 # URI::Query tests
 
-use Test::More tests => 15;
+use Test::More tests => 22;
 BEGIN { use_ok( URI::Query ) }
 use strict;
 my $qq;
@@ -40,4 +40,16 @@ ok($qq = URI::Query->new(foo => 1, foo => 2, bar => '', bog => 'abc', zero => 0,
 ok($qq->strip_null, "strip_null ok");
 is($qq->stringify, 'bog=abc&foo=1&foo=2&zero=0', 
   sprintf("strip_null correct (%s)", $qq->stringify));
+
+# strip_like
+ok($qq = URI::Query->new('foo=1&foo=2&bar=3;bog=abc;bar=7;fluffy=3;zero=0'), "constructor ok");
+ok($qq->strip_like(qr/^b/), "strip_like ok");
+is($qq->stringify, 'fluffy=3&foo=1&foo=2&zero=0', 
+  sprintf("strip_like correct (%s)", $qq->stringify));
+ok($qq->strip_like(qr/^f[lzx]/), "strip_like ok");
+is($qq->stringify, 'foo=1&foo=2&zero=0', 
+  sprintf("strip_like correct (%s)", $qq->stringify));
+ok($qq->strip_like(qr/\d/), "strip_like ok");
+is($qq->stringify, 'foo=1&foo=2&zero=0', 
+  sprintf("strip_like correct (%s)", $qq->stringify));
 

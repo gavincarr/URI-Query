@@ -8,6 +8,7 @@ use 5.00503;
 use strict;
 
 use URI::Escape qw(uri_escape_utf8 uri_unescape);
+use Carp;
 
 use overload
   '""'    => \&stringify,
@@ -48,6 +49,22 @@ sub strip_null
         next if @{$self->{qq}->{$_}};
         delete $self->{qq}->{$_} and $self->{changed}++;
     }
+    $self;
+}
+
+# Remove all parameters matching $re
+sub strip_like
+{
+    my $self = shift;
+    my $re = shift or croak "Missing regex param to strip_like";
+    croak "Invalid param '$re' to strip_like - must be regex" if ! ref $re || ref $re ne 'Regexp';
+    croak "Too many params to strip_like - only one permitted" if @_;
+
+    foreach (keys %{$self->{qq}}) {
+        next if $_ !~ $re;
+        delete $self->{qq}->{$_} and $self->{changed}++;
+    }
+
     $self;
 }
 
@@ -379,6 +396,14 @@ Note that 'replace' can also be used to add or append, since there's
 no requirement that the parameters already exist in the current parameter
 set.
 
+=item strip_like($regex)
+
+Remove all parameters whose names match the given (qr-quoted) regex e.g.
+
+    $qq->strip_like(qr/^utm/)
+
+Does NOT match against parameter values.
+
 =item separator($separator)
 
 Set the argument separator to use for output. Default: '&'.
@@ -392,8 +417,8 @@ Set the argument separator to use for output. Default: '&'.
 =item has_changed()
 
 If the query is actually changed by any of the modifier methods (strip,
-strip_except, strip_null, or replace) it sets an internal changed flag
-which can be access by:
+strip_except, strip_null, strip_like, or replace) it sets an internal
+changed flag which can be access by:
 
     $qq->has_changed
 
