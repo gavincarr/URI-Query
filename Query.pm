@@ -16,7 +16,7 @@ use overload
   'ne'  => sub { $_[0]->stringify ne $_[1]->stringify };
 
 use vars q($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 # -------------------------------------------------------------------------
 # Remove all occurrences of the given parameters
@@ -509,7 +509,7 @@ Gavin Carr <gavin@openfusion.com.au>
 
 =head1 COPYRIGHT
 
-Copyright 2004-2011, Gavin Carr. All Rights Reserved.
+Copyright 2004-2015, Gavin Carr.
 
 This program is free software. You may copy or redistribute it under the
 same terms as perl itself.
