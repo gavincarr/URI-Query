@@ -22,8 +22,10 @@ $VERSION = '0.10';
 sub strip
 {
     my $self = shift;
-    delete $self->{qq}->{$_} foreach @_;
-    $self
+    foreach (@_) {
+        delete $self->{qq}->{$_} and $self->{changed}++;
+    }
+    $self;
 }
 
 # Remove all parameters except those given
@@ -32,9 +34,10 @@ sub strip_except
     my $self = shift;
     my %keep = map { $_ => 1 } @_;
     foreach (keys %{$self->{qq}}) {
-        delete $self->{qq}->{$_} unless $keep{$_};
+        next if $keep{$_};
+        delete $self->{qq}->{$_} and $self->{changed}++;
     }
-    $self
+    $self;
 }
 
 # Remove all empty/undefined parameters
@@ -42,9 +45,10 @@ sub strip_null
 {
     my $self = shift;
     foreach (keys %{$self->{qq}}) {
-        delete $self->{qq}->{$_} unless @{$self->{qq}->{$_}};
+        next if @{$self->{qq}->{$_}};
+        delete $self->{qq}->{$_} and $self->{changed}++;
     }
-    $self
+    $self;
 }
 
 # Replace all occurrences of the given parameters
@@ -60,8 +64,9 @@ sub replace
         else {
             push @{$self->{qq}->{$key}}, $arg{$key};
         }
+        $self->{changed}++;
     }
-    $self
+    $self;
 }
 
 # Return the stringified qq hash
@@ -83,7 +88,13 @@ sub revert
     my $self = shift;
     # Revert qq to the qq_orig hashref
     $self->{qq} = $self->_deepcopy($self->{qq_orig});
-    $self
+    $self->{changed} = 0;
+    $self;
+}
+
+sub has_changed {
+    my $self = shift;
+    $self->{changed} > 0 ? 1 : 0;
 }
 
 # -------------------------------------------------------------------------
@@ -210,6 +221,9 @@ sub new
     # Clone the qq hashref to allow reversion
     $self->{qq_orig} = $self->_deepcopy($self->{qq});
 
+    # Changed flag
+    $self->{changed} = 0;
+
     return $self;
 }
 # -------------------------------------------------------------------------
@@ -262,6 +276,11 @@ URI::Query - class providing URI query string manipulation
 
     # Get the current query string as a set of hidden input tags
     print $qq->hidden;
+
+    # Check whether the query has changed since construction
+    if ($qq->has_changed) {
+      print "changed version: $qq\n";
+    }
 
 
 =head1 DESCRIPTION
@@ -363,6 +382,22 @@ set.
 =item separator($separator)
 
 Set the argument separator to use for output. Default: '&'.
+
+=back
+
+=head2 ACCESSOR METHODS
+
+=over 4
+
+=item has_changed()
+
+If the query is actually changed by any of the modifier methods (strip,
+strip_except, strip_null, or replace) it sets an internal changed flag
+which can be access by:
+
+    $qq->has_changed
+
+revert() resets the has_changed flag to false.
 
 =back
 
