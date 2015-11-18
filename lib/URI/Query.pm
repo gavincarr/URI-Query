@@ -516,4 +516,6 @@ same terms as perl itself.
 
 =cut
 
+=for Pod::Coverage new
+
 # vim:sw=4:et
