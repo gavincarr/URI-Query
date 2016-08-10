@@ -6,6 +6,7 @@ package URI::Query;
 
 use 5.00503;
 use strict;
+use parent 'Clone';
 
 use URI::Escape qw(uri_escape_utf8 uri_unescape);
 use Carp;
@@ -16,7 +17,7 @@ use overload
   'ne'  => sub { $_[0]->stringify ne $_[1]->stringify };
 
 use vars q($VERSION);
-$VERSION = '0.11';
+$VERSION = '0.16';
 
 # -------------------------------------------------------------------------
 # Remove all occurrences of the given parameters
@@ -98,6 +99,13 @@ sub stringify
         }
     }
     join $sep, @out;
+}
+
+# Return the stringified qq hash with a leading '?'
+sub qstringify
+{
+    my $self = shift;
+    return '?' . $self->stringify(@_);
 }
 
 sub revert
@@ -260,6 +268,9 @@ URI::Query - class providing URI query string manipulation
     # OR Constructor - using an array of successive keys and values
     $qq = URI::Query->new(@params);
 
+    # Clone the current object
+    $qq2 = $qq->clone;
+
     # Revert back to the initial constructor state (to do it all again)
     $qq->revert;
 
@@ -282,6 +293,11 @@ URI::Query - class providing URI query string manipulation
     print "$qq";           # OR $qq->stringify;
     # Stringify with explicit argument separator
     $qq->stringify(';');
+
+    # Output the current query string with a leading '?'
+    $qq->qstringify;
+    # Stringify with a leading '?' and an explicit argument separator
+    $qq->qstringify(';');
 
     # Get a flattened hash/hashref of the current parameters
     #   (single item parameters as scalars, multiples as an arrayref)
@@ -350,6 +366,11 @@ You should always use the unescaped/normal variants in methods i.e.
 NOT:
 
      $qq->replace('op%3Aset'  => 'x%3Dz');
+
+You can also construct a new URI::Query object by cloning an existing
+one:
+
+     $qq2 = $qq->clone;
 
 
 =head2 MODIFIER METHODS
@@ -447,6 +468,12 @@ instance, a parameter set of:
 will be stringified as:
 
     group=prod%2Cinfra%2Ctest&op%3Aset=x%3Dy
+
+=item qstringify(), qstringify($separator)
+
+Convenience method to stringify with a leading '?' e.g.
+
+    ?foo=1&bar=2&bar=3
 
 =item hash()
 

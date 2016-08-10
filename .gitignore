@@ -1,5 +1,6 @@
 .*.sw?
 *~
+.build
 blib*
 ChangeLog
 Makefile
